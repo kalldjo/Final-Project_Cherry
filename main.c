@@ -49,8 +49,29 @@ void showAllStudents() {
 
 
 void findStudent() {
-	// Fungsi untuk mencari mahasiswa berdasarkan nama
+	char name[NAME_LENGTH];
+    printf("Masukkan nama mahasiswa yang dicari: ");
+    getchar(); // Untuk menghapus newline sebelumnya
+    fgets(name, NAME_LENGTH, stdin);
+    name[strcspn(name, "\n")] = '\0';  // Menghapus newline di akhir nama
+
+    int found = 0;
+    int i;
+    for (i = 0; i < studentCount; i++) {
+        if (strcmp(students[i].name, name) == 0) {
+            printf("Nama: %s, Usia: %d, Grade: %c\n", students[i].name, students[i].age, students[i].grade);
+            found = 1;
+            break;
+        }
+    }
+
+    if (!found) {
+        printf("Mahasiswa dengan nama %s tidak ditemukan.\n\n", name);
+    } else {
+        printf("\n");
+    }
 }
+
 
 
 void deleteStudent() {
