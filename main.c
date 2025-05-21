@@ -8,7 +8,7 @@
 #define MAX_COURSES 3
 #define COURSE_NAME_LENGTH 50
 
-// struct untuk menyimpan informasi mahasiswa
+// struct 
 typedef struct {
     char name[NAME_LENGTH];
     char npm[NPM_LENGTH];
@@ -18,14 +18,55 @@ typedef struct {
     char courses[MAX_COURSES][COURSE_NAME_LENGTH];
 } Student;
 
-// deklarasi array untuk menyimpan data mahasiswa
 Student students[MAX_STUDENTS];
 int studentCount = 0;
 
 
 void addStudent() {
-  	// Fungsi untuk menambah mahasiswa baru 
+    if (studentCount >= MAX_STUDENTS) {
+        printf("Database penuh. Tidak bisa menambah mahasiswa baru.\n");
+        return;
+    }
+
+    Student newStudent;
+
+    printf("Masukkan nama mahasiswa: ");
+    getchar(); 
+    fgets(newStudent.name, NAME_LENGTH, stdin);
+    newStudent.name[strcspn(newStudent.name, "\n")] = '\0';
+
+    printf("Masukkan NPM mahasiswa: ");
+    fgets(newStudent.npm, NPM_LENGTH, stdin);
+    newStudent.npm[strcspn(newStudent.npm, "\n")] = '\0';
+
+    printf("Masukkan usia mahasiswa: ");
+    scanf("%d", &newStudent.age);
+
+    printf("Masukkan grade mahasiswa (A/B/C/D/F): ");
+    getchar(); 
+    scanf("%c", &newStudent.grade);
+
+    printf("Masukkan jumlah mata kuliah (maks %d): ", MAX_COURSES);
+    scanf("%d", &newStudent.courseCount);
+    getchar(); 
+
+    if (newStudent.courseCount > MAX_COURSES) {
+        printf("Maksimal hanya bisa mengambil %d mata kuliah. Dibatasi ke %d.\n", MAX_COURSES, MAX_COURSES);
+        newStudent.courseCount = MAX_COURSES;
+    }
+
+    for (int i = 0; i < newStudent.courseCount; i++) {
+        printf("Masukkan nama mata kuliah ke-%d: ", i + 1);
+        fgets(newStudent.courses[i], COURSE_NAME_LENGTH, stdin);
+        newStudent.courses[i][strcspn(newStudent.courses[i], "\n")] = '\0';
+    }
+
+    students[studentCount] = newStudent;
+    studentCount++;
+
+    printf("Mahasiswa berhasil ditambahkan.\n\n");
 }
+
 
 
 void showAllStudents() {
@@ -51,9 +92,9 @@ void showAllStudents() {
 void findStudent() {
 	char name[NAME_LENGTH];
     printf("Masukkan nama mahasiswa yang dicari: ");
-    getchar(); // Untuk menghapus newline sebelumnya
+    getchar(); 
     fgets(name, NAME_LENGTH, stdin);
-    name[strcspn(name, "\n")] = '\0';  // Menghapus newline di akhir nama
+    name[strcspn(name, "\n")] = '\0';  
 
     int found = 0;
     int i;
@@ -75,7 +116,28 @@ void findStudent() {
 
 
 void deleteStudent() {
-   // Fungsi untuk menghapus mahasiswa berdasarkan nama
+   char name[NAME_LENGTH];
+    printf("Masukkan nama mahasiswa yang ingin dihapus: ");
+    getchar(); 
+    fgets(name, NAME_LENGTH, stdin);
+    name[strcspn(name, "\n")] = '\0';
+
+    int found = 0;
+    for (int i = 0; i < studentCount; i++) {
+        if (strcmp(students[i].name, name) == 0) {
+            for (int j = i; j < studentCount - 1; j++) {
+                students[j] = students[j + 1];
+            }
+            studentCount--;
+            found = 1;
+            printf("Mahasiswa %s berhasil dihapus.\n\n", name);
+            break;
+        }
+    }
+
+    if (!found) {
+        printf("Mahasiswa dengan nama %s tidak ditemukan.\n\n", name);
+    }
 }
 
 
