@@ -8,7 +8,7 @@
 #define MAX_COURSES 3
 #define COURSE_NAME_LENGTH 50
 
-// Struktur data untuk menyimpan informasi mahasiswa
+// struct untuk menyimpan informasi mahasiswa
 typedef struct {
     char name[NAME_LENGTH];
     char npm[NPM_LENGTH];
@@ -18,7 +18,7 @@ typedef struct {
     char courses[MAX_COURSES][COURSE_NAME_LENGTH];
 } Student;
 
-// Deklarasi array untuk menyimpan data mahasiswa
+// deklarasi array untuk menyimpan data mahasiswa
 Student students[MAX_STUDENTS];
 int studentCount = 0;
 
@@ -29,8 +29,23 @@ void addStudent() {
 
 
 void showAllStudents() {
-	// Fungsi untuk menampilkan semua data mahasiswa
+    if (studentCount == 0) {
+        printf("Belum ada data mahasiswa.\n\n");
+        return;
+    }
+
+    printf("Daftar Mahasiswa:\n");
+    for (int i = 0; i < studentCount; i++){
+        printf("Nama: %s, NPM: %s, Usia: %d, Grade: %c\n", 
+        students[i].name, students[i].npm, students[i].age, students[i].grade);
+        printf("  Mata kuliah (%d):\n", students[i].courseCount);
+        for (int j = 0; j < students[i].courseCount; j++) {
+            printf("    - %s\n", students[i].courses[j]);
+        }
+    }
+    printf("\n");
 }
+
 
 
 void findStudent() {
@@ -42,7 +57,7 @@ void deleteStudent() {
    // Fungsi untuk menghapus mahasiswa berdasarkan nama
 }
 
-// Fungsi utama
+
 int main() {
     int choice;
     int running = 1;
