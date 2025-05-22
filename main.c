@@ -143,10 +143,10 @@ void deleteStudent() {
 
 int main() {
     int choice;
-    int running = 1;
 
-    while (running) {
-        printf("===== Sistem Manajemen Mahasiswa =====\n");
+    do
+    {
+         printf("===== Sistem Manajemen Mahasiswa =====\n");
         printf("1. Tambah Mahasiswa\n");
         printf("2. Lihat Semua Mahasiswa\n");
         printf("3. Cari Mahasiswa\n");
@@ -175,7 +175,7 @@ int main() {
             default:
                 printf("Pilihan tidak valid. Silakan coba lagi.\n\n");
         }
-    }
-
+    } while (choice != 5);
+    
     return 0;
 }
