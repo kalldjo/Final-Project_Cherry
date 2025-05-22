@@ -170,7 +170,6 @@ int main() {
                 break;
             case 5:
                 printf("Keluar dari program.\n");
-                running = 0;
                 break;
             default:
                 printf("Pilihan tidak valid. Silakan coba lagi.\n\n");
