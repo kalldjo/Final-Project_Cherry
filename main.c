@@ -41,6 +41,29 @@ typedef struct {
 Student students[MAX_STUDENTS];
 int studentCount = 0;
 
+float calculateFinalScore(Course c) {
+    float kehadiranScore = ((float)c.kehadiran / 14.0f) * 100.0f * 0.10f;
+    float tugasScore = ((c.tugas1 + c.tugas2 + c.tugas3) / 3.0f) * 0.20f;
+    return kehadiranScore + c.quiz * 0.20f + c.uts * 0.30f + c.uas * 0.30f + tugasScore;
+}
+
+void assignGrade(Course *c) {
+    float score = c->finalScore;
+    if (score >= 85) strcpy(c->grade, "A");
+    else if (score >= 80) strcpy(c->grade, "A-");
+    else if (score >= 75) strcpy(c->grade, "B+");
+    else if (score >= 70) strcpy(c->grade, "B");
+    else if (score >= 65) strcpy(c->grade, "B-");
+    else if (score >= 60) strcpy(c->grade, "C+");
+    else if (score >= 55) strcpy(c->grade, "C");
+    else if (score >= 40) strcpy(c->grade, "D");
+    else strcpy(c->grade, "E");
+
+    if (strcmp(c->grade, "D") == 0 || strcmp(c->grade, "E") == 0)
+        strcpy(c->status, "Tidak LULUS");
+    else
+        strcpy(c->status, "LULUS");
+}
 
 void addStudent() {
     if (studentCount >= MAX_STUDENTS) {
@@ -95,16 +118,24 @@ void showAllStudents() {
         return;
     }
 
-    printf("Daftar Mahasiswa:\n");
-    for (int i = 0; i < studentCount; i++){
-        printf("Nama: %s, NPM: %s, Usia: %d, Grade: %c\n", 
-        students[i].name, students[i].npm, students[i].age, students[i].grade);
-        printf("  Mata kuliah (%d):\n", students[i].courseCount);
+    for (int i = 0; i < studentCount; i++) {
+        printf("========================================================\n");
+        printf("Nama: %s\nNPM: %s\nUsia: %d\n", students[i].name, students[i].npm, students[i].age);
+
+        float totalNilai = 0.0;
+        int totalSKS = 0;
+        printf("%-3s %-40s %-4s %-6s %-10s %-8s\n", "No", "Mata Kuliah", "SKS", "Grade", "Status", "Final");
         for (int j = 0; j < students[i].courseCount; j++) {
-            printf("    - %s\n", students[i].courses[j]);
+            Course c = students[i].courses[j];
+            int idx = c.index;
+            printf("%-3d %-40s %-4d %-6s %-10s %-8.2f\n", j + 1, courseList[idx], courseSKS[idx], c.grade, c.status, c.finalScore);
+            totalNilai += gradeToPoint(c.grade) * courseSKS[idx];
+            totalSKS += courseSKS[idx];
         }
+        float ipk = totalSKS > 0 ? totalNilai / totalSKS : 0.0;
+        printf("IPK: %.2f\n", ipk);
+        printf("========================================================\n\n");
     }
-    printf("\n");
 }
 
 
