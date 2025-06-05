@@ -72,9 +72,10 @@ void addStudent() {
     }
 
     Student newStudent;
+    int totalSKS = 0;
 
     printf("Masukkan nama mahasiswa: ");
-    getchar(); 
+    getchar();
     fgets(newStudent.name, NAME_LENGTH, stdin);
     newStudent.name[strcspn(newStudent.name, "\n")] = '\0';
 
@@ -85,32 +86,63 @@ void addStudent() {
     printf("Masukkan usia mahasiswa: ");
     scanf("%d", &newStudent.age);
 
-    printf("Masukkan grade mahasiswa (A/B/C/D/F): ");
-    getchar(); 
-    scanf("%c", &newStudent.grade);
+    printf("Pilih mata kuliah (minimal 20 SKS, maksimal 24 SKS):\n");
+    for (int i = 0; i < MAX_COURSES; i++) {
+        printf("%d. %s (%d SKS)\n", i + 1, courseList[i], courseSKS[i]);
+    }
 
-    printf("Masukkan jumlah mata kuliah (maks %d): ", MAX_COURSES);
-    scanf("%d", &newStudent.courseCount);
-    getchar(); 
+    newStudent.courseCount = 0;
+    while (totalSKS < 20 || totalSKS > 24) {
+        totalSKS = 0;
+        newStudent.courseCount = 0;
+        printf("Masukkan jumlah mata kuliah yang diambil: ");
+        int jumlah;
+        scanf("%d", &jumlah);
+        getchar();
 
-    if (newStudent.courseCount > MAX_COURSES) {
-        printf("Maksimal hanya bisa mengambil %d mata kuliah. Dibatasi ke %d.\n", MAX_COURSES, MAX_COURSES);
-        newStudent.courseCount = MAX_COURSES;
+        for (int i = 0; i < jumlah; i++) {
+            int pilih;
+            printf("Pilih nomor mata kuliah ke-%d: ", i + 1);
+            scanf("%d", &pilih);
+            getchar();
+            if (pilih < 1 || pilih > MAX_COURSES) {
+                printf("Pilihan tidak valid.\n");
+                i--;
+                continue;
+            }
+            newStudent.courses[i].index = pilih - 1;
+            totalSKS += courseSKS[pilih - 1];
+            newStudent.courseCount++;
+        }
+        if (totalSKS < 20 || totalSKS > 24) {
+            printf("Total SKS saat ini %d, harus antara 20 hingga 24. Ulangi input.\n", totalSKS);
+        }
     }
 
     for (int i = 0; i < newStudent.courseCount; i++) {
-        printf("Masukkan nama mata kuliah ke-%d: ", i + 1);
-        fgets(newStudent.courses[i], COURSE_NAME_LENGTH, stdin);
-        newStudent.courses[i][strcspn(newStudent.courses[i], "\n")] = '\0';
+        printf("\n--- %s ---\n", courseList[newStudent.courses[i].index]);
+        printf("Masukkan jumlah kehadiran (maks 14): ");
+        scanf("%d", &newStudent.courses[i].kehadiran);
+        printf("Masukkan nilai Quiz: ");
+        scanf("%f", &newStudent.courses[i].quiz);
+        printf("Masukkan nilai UTS: ");
+        scanf("%f", &newStudent.courses[i].uts);
+        printf("Masukkan nilai UAS: ");
+        scanf("%f", &newStudent.courses[i].uas);
+        printf("Masukkan nilai Tugas 1: ");
+        scanf("%f", &newStudent.courses[i].tugas1);
+        printf("Masukkan nilai Tugas 2: ");
+        scanf("%f", &newStudent.courses[i].tugas2);
+        printf("Masukkan nilai Tugas 3: ");
+        scanf("%f", &newStudent.courses[i].tugas3);
+
+        newStudent.courses[i].finalScore = calculateFinalScore(newStudent.courses[i]);
+        assignGrade(&newStudent.courses[i]);
     }
 
-    students[studentCount] = newStudent;
-    studentCount++;
-
+    students[studentCount++] = newStudent;
     printf("Mahasiswa berhasil ditambahkan.\n\n");
 }
-
-
 
 void showAllStudents() {
     if (studentCount == 0) {
@@ -164,12 +196,10 @@ void findStudent() {
     }
 }
 
-
-
 void deleteStudent() {
-   char name[NAME_LENGTH];
+    char name[NAME_LENGTH];
     printf("Masukkan nama mahasiswa yang ingin dihapus: ");
-    getchar(); 
+    getchar();
     fgets(name, NAME_LENGTH, stdin);
     name[strcspn(name, "\n")] = '\0';
 
@@ -181,16 +211,164 @@ void deleteStudent() {
             }
             studentCount--;
             found = 1;
-            printf("Mahasiswa %s berhasil dihapus.\n\n", name);
+            printf("Mahasiswa berhasil dihapus.\n\n");
+            break;
+        }
+    }
+    if (!found) {
+        printf("Mahasiswa tidak ditemukan.\n\n");
+    }
+}
+
+void editStudent() {
+    char name[NAME_LENGTH];
+    printf("Masukkan nama mahasiswa yang ingin diedit: ");
+    getchar();
+    fgets(name, NAME_LENGTH, stdin);
+    name[strcspn(name, "\n")] = '\0';
+
+    Student *studentToEdit = NULL; 
+    for (int i = 0; i < studentCount; i++) {
+        if (strcmp(students[i].name, name) == 0) {
+            studentToEdit = &students[i];
             break;
         }
     }
 
-    if (!found) {
-        printf("Mahasiswa dengan nama %s tidak ditemukan.\n\n", name);
+    if (studentToEdit == NULL) {
+        printf("Mahasiswa tidak ditemukan.\n\n");
+        return;
     }
-}
 
+    printf("Editing data untuk mahasiswa: %s\n", studentToEdit->name);
+
+    printf("Masukkan nama baru (tekan enter untuk tidak mengubah): ");
+    char newName[NAME_LENGTH];
+    fgets(newName, NAME_LENGTH, stdin);
+    newName[strcspn(newName, "\n")] = '\0';
+    if (strlen(newName) > 0) {
+        strcpy(studentToEdit->name, newName);
+    }
+
+    printf("Masukkan NPM baru (tekan enter untuk tidak mengubah): ");
+    char newNpm[NPM_LENGTH];
+    fgets(newNpm, NPM_LENGTH, stdin);
+    newNpm[strcspn(newNpm, "\n")] = '\0';
+    if (strlen(newNpm) > 0) {
+        strcpy(studentToEdit->npm, newNpm);
+    }
+
+
+    printf("Masukkan usia baru (tekan enter untuk tidak mengubah): ");
+    int newAge;
+    int result = scanf("%d", &newAge);
+    if (result == 1) {
+        studentToEdit->age = newAge;
+    }
+    getchar(); 
+
+    printf("Ingin mengedit nilai mata kuliah? (y/n): ");
+    char editCoursesChoice;
+    scanf("%c", &editCoursesChoice);
+    getchar();
+    if (editCoursesChoice == 'y' || editCoursesChoice == 'Y') {
+        for (int i = 0; i < studentToEdit->courseCount; i++) {
+            Course *c = &studentToEdit->courses[i]; 
+            int idx = c->index;
+
+            printf("\n--- %s ---\n", courseList[idx]);
+
+            printf("Jumlah kehadiran saat ini: %d (maks 14)\n", c->kehadiran);
+            printf("Masukkan kehadiran baru (tekan enter untuk tidak mengubah): ");
+            char buff[10];
+            fgets(buff, sizeof(buff), stdin);
+            if (buff[0] != '\n') {
+                int val = atoi(buff);
+                if (val >= 0 && val <= 14) {
+                    c->kehadiran = val;
+                } else {
+                    printf("Input kehadiran tidak valid, nilai tidak diubah.\n");
+                }
+            }
+
+            printf("Nilai Quiz saat ini: %.2f\n", c->quiz);
+            printf("Masukkan nilai Quiz baru (tekan enter untuk tidak mengubah): ");
+            fgets(buff, sizeof(buff), stdin);
+            if (buff[0] != '\n') {
+                float val = atof(buff);
+                if (val >= 0 && val <= 100) {
+                    c->quiz = val;
+                } else {
+                    printf("Input nilai Quiz tidak valid, nilai tidak diubah.\n");
+                }
+            }
+
+            printf("Nilai UTS saat ini: %.2f\n", c->uts);
+            printf("Masukkan nilai UTS baru (tekan enter untuk tidak mengubah): ");
+            fgets(buff, sizeof(buff), stdin);
+            if (buff[0] != '\n') {
+                float val = atof(buff);
+                if (val >= 0 && val <= 100) {
+                    c->uts = val;
+                } else {
+                    printf("Input nilai UTS tidak valid, nilai tidak diubah.\n");
+                }
+            }
+
+            printf("Nilai UAS saat ini: %.2f\n", c->uas);
+            printf("Masukkan nilai UAS baru (tekan enter untuk tidak mengubah): ");
+            fgets(buff, sizeof(buff), stdin);
+            if (buff[0] != '\n') {
+                float val = atof(buff);
+                if (val >= 0 && val <= 100) {
+                    c->uas = val;
+                } else {
+                    printf("Input nilai UAS tidak valid, nilai tidak diubah.\n");
+                }
+            }
+
+            printf("Nilai Tugas 1 saat ini: %.2f\n", c->tugas1);
+            printf("Masukkan nilai Tugas 1 baru (tekan enter untuk tidak mengubah): ");
+            fgets(buff, sizeof(buff), stdin);
+            if (buff[0] != '\n') {
+                float val = atof(buff);
+                if (val >= 0 && val <= 100) {
+                    c->tugas1 = val;
+                } else {
+                    printf("Input nilai Tugas 1 tidak valid, nilai tidak diubah.\n");
+                }
+            }
+
+            printf("Nilai Tugas 2 saat ini: %.2f\n", c->tugas2);
+            printf("Masukkan nilai Tugas 2 baru (tekan enter untuk tidak mengubah): ");
+            fgets(buff, sizeof(buff), stdin);
+            if (buff[0] != '\n') {
+                float val = atof(buff);
+                if (val >= 0 && val <= 100) {
+                    c->tugas2 = val;
+                } else {
+                    printf("Input nilai Tugas 2 tidak valid, nilai tidak diubah.\n");
+                }
+            }
+
+            printf("Nilai Tugas 3 saat ini: %.2f\n", c->tugas3);
+            printf("Masukkan nilai Tugas 3 baru (tekan enter untuk tidak mengubah): ");
+            fgets(buff, sizeof(buff), stdin);
+            if (buff[0] != '\n') {
+                float val = atof(buff);
+                if (val >= 0 && val <= 100) {
+                    c->tugas3 = val;
+                } else {
+                    printf("Input nilai Tugas 3 tidak valid, nilai tidak diubah.\n");
+                }
+            }
+	
+            c->finalScore = calculateFinalScore(*c);
+            assignGrade(c);
+        }
+    }
+    printf("Data mahasiswa berhasil diperbarui.\n\n");
+}
 
 int main() {
     int choice;
