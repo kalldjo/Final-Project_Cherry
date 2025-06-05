@@ -75,6 +75,7 @@ float gradeToPoint(const char *grade) {
     if (strcmp(grade, "C") == 0) return 2.0;
     if (strcmp(grade, "D") == 0) return 1.0;
     return 0.0;
+    }
 
 void addStudent() {
     if (studentCount >= MAX_STUDENTS) {
