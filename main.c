@@ -65,6 +65,17 @@ void assignGrade(Course *c) {
         strcpy(c->status, "LULUS");
 }
 
+float gradeToPoint(const char *grade) {
+    if (strcmp(grade, "A") == 0) return 4.0;
+    if (strcmp(grade, "A-") == 0) return 3.7;
+    if (strcmp(grade, "B+") == 0) return 3.3;
+    if (strcmp(grade, "B") == 0) return 3.0;
+    if (strcmp(grade, "B-") == 0) return 2.7;
+    if (strcmp(grade, "C+") == 0) return 2.3;
+    if (strcmp(grade, "C") == 0) return 2.0;
+    if (strcmp(grade, "D") == 0) return 1.0;
+    return 0.0;
+
 void addStudent() {
     if (studentCount >= MAX_STUDENTS) {
         printf("Database penuh. Tidak bisa menambah mahasiswa baru.\n");
@@ -170,29 +181,24 @@ void showAllStudents() {
     }
 }
 
-
-
 void findStudent() {
-	char name[NAME_LENGTH];
+    char name[NAME_LENGTH];
     printf("Masukkan nama mahasiswa yang dicari: ");
-    getchar(); 
+    getchar();
     fgets(name, NAME_LENGTH, stdin);
-    name[strcspn(name, "\n")] = '\0';  
+    name[strcspn(name, "\n")] = '\0';
 
     int found = 0;
-    int i;
-    for (i = 0; i < studentCount; i++) {
+    for (int i = 0; i < studentCount; i++) {
         if (strcmp(students[i].name, name) == 0) {
-            printf("Nama: %s, Usia: %d, Grade: %c\n", students[i].name, students[i].age, students[i].grade);
+            printf("Ditemukan:\n");
+            printf("Nama: %s, NPM: %s, Usia: %d\n", students[i].name, students[i].npm, students[i].age);
             found = 1;
             break;
         }
     }
-
     if (!found) {
-        printf("Mahasiswa dengan nama %s tidak ditemukan.\n\n", name);
-    } else {
-        printf("\n");
+        printf("Mahasiswa tidak ditemukan.\n\n");
     }
 }
 
